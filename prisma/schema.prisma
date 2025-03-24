@@ -8,7 +8,226 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// 临时使用 SQLite 进行本地开发
+// 注意：部署到生产环境前需要改回 MySQL
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum UserRole {
+  SALES
+  DESIGNER
+  PROJECT_MANAGER
+  SHAREHOLDER
+  ADMIN
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  DELAYED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ContactMethod {
+  PHONE
+  EMAIL
+  MEETING
+  VIDEO_CALL
+  OTHER
+}
+
+enum CustomerStatus {
+  LEAD
+  ACTIVE
+  INACTIVE
+}
+
+enum CustomerIndustry {
+  TECHNOLOGY
+  MANUFACTURING
+  HEALTHCARE
+  FINANCE
+  FOOD
+  OTHER
+}
+
+enum NotificationType {
+  TASK_ASSIGNED
+  TASK_STATUS_UPDATED
+  TASK_DUE_SOON
+  TASK_OVERDUE
+  TASK_COMMENT_ADDED
+  CUSTOMER_ADDED
+  CUSTOMER_UPDATED
+  CONTACT_ADDED
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+  FATAL
+}
+
+model User {
+  id                String         @id @default(uuid())
+  email             String         @unique
+  password          String
+  name              String
+  role              UserRole
+  isApproved        Boolean        @default(false)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  customers         Customer[]     @relation("AssignedSalesperson")
+  tasks             Task[]         @relation("AssignedTo")
+  createdTasks      Task[]         @relation("CreatedBy")
+  contactLogs       ContactRecord[]
+  taskLogs          TaskLog[]      @relation("LoggedBy")
+  taskComments      TaskComment[]  @relation("CommentedBy")
+  receivedNotifications Notification[] @relation("NotificationReceiver")
+  notificationSettings NotificationSettings?
+}
+
+model Customer {
+  id            String           @id @default(uuid())
+  name          String
+  email         String?
+  phone         String?
+  address       String?
+  industry      CustomerIndustry @default(OTHER)
+  status        CustomerStatus   @default(LEAD)
+  requirements  String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  salespersonId String?
+  salesperson   User?            @relation("AssignedSalesperson", fields: [salespersonId], references: [id])
+  contactLogs   ContactRecord[]
+  tasks         Task[]
+}
+
+model ContactRecord {
+  id           String        @id @default(uuid())
+  date         DateTime      @default(now())
+  method       ContactMethod
+  content      String
+  feedback     String?
+  followUpPlan String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  customerId   String
+  customer     Customer      @relation(fields: [customerId], references: [id])
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  status      TaskStatus   @default(PENDING)
+  priority    TaskPriority @default(MEDIUM)
+  dueDate     DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  customerId  String?
+  customer    Customer?    @relation(fields: [customerId], references: [id])
+  assigneeId  String?
+  assignee    User?        @relation("AssignedTo", fields: [assigneeId], references: [id])
+  creatorId   String
+  creator     User         @relation("CreatedBy", fields: [creatorId], references: [id])
+  logs        TaskLog[]
+  comments    TaskComment[]
+}
+
+model TaskLog {
+  id          String      @id @default(uuid())
+  taskId      String
+  task        Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User        @relation("LoggedBy", fields: [userId], references: [id])
+  action      String      // e.g. "status_changed", "assignee_changed", "priority_changed"
+  oldValue    String?     // JSON string of old values
+  newValue    String?     // JSON string of new values
+  comment     String?
+  createdAt   DateTime    @default(now())
+}
+
+model TaskComment {
+  id          String      @id @default(uuid())
+  taskId      String
+  task        Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User        @relation("CommentedBy", fields: [userId], references: [id])
+  content     String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  userId      String           // 通知接收者
+  user        User             @relation("NotificationReceiver", fields: [userId], references: [id])
+  type        NotificationType
+  title       String
+  content     String
+  isRead      Boolean          @default(false)
+  relatedId   String?          // 相关实体ID (任务ID, 客户ID等)
+  relatedType String?          // 相关实体类型 ("task", "customer", "contact")
+  createdAt   DateTime         @default(now())
+}
+
+model SystemLog {
+  id        String    @id @default(uuid())
+  level     String    // 使用LogLevel枚举值的字符串表示
+  message   String
+  details   String?
+  timestamp DateTime  @default(now())
+  
+  // 添加索引以提高查询性能
+  @@index([level])
+  @@index([timestamp])
+}
+
+model APIMetric {
+  id          String    @id @default(uuid())
+  path        String
+  method      String
+  statusCode  Int
+  duration    Int       // 以毫秒为单位
+  timestamp   DateTime  @default(now())
+  
+  // 添加索引以提高查询性能
+  @@index([path, method])
+  @@index([statusCode])
+  @@index([timestamp])
+}
+
+model NotificationSettings {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailNotifications Boolean  @default(true)
+  pushNotifications  Boolean  @default(true)
+  taskAssigned       Boolean  @default(true)
+  taskStatusChanged  Boolean  @default(true)
+  taskDueSoon        Boolean  @default(true)
+  taskOverdue        Boolean  @default(true)
+  taskCommentAdded   Boolean  @default(true)
+  customerAdded      Boolean  @default(true)
+  customerUpdated    Boolean  @default(true)
+  dailySummary       Boolean  @default(false)
+  weeklySummary      Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }

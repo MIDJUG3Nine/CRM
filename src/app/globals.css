@@ -3,24 +3,184 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --card-background: #ffffff;
+  --card-foreground: #171717;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #f9fafb;
+  --accent-foreground: #111827;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #3b82f6;
+  --radius: 0.5rem;
+  --header-bg: #ffffff;
+  --header-text: #111827;
+  --sidebar-bg: #f9fafb;
+  --sidebar-text: #111827;
+  --sidebar-hover: #f3f4f6;
+  --sidebar-active: #e5e7eb;
+  --table-header: #f9fafb;
+  --table-border: #e5e7eb;
+  --table-row-hover: #f3f4f6;
+  --modal-overlay: rgba(0, 0, 0, 0.5);
+  --tooltip-bg: #111827;
+  --tooltip-text: #ffffff;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 增强文本颜色可读性 */
+.text-gray-500 {
+  color: #374151 !important;
+}
+
+.text-gray-600 {
+  color: #1f2937 !important;
+}
+
+.text-gray-700 {
+  color: #111827 !important;
+}
+
+/* 表格文本增强 */
+table td, table th {
+  color: #111827 !important;
+}
+
+/* 输入框文本颜色增强 */
+input, textarea, select {
+  color: #111827 !important;
+}
+
+/* 输入框placeholder颜色加深 */
+::placeholder {
+  color: #4b5563 !important;
+  opacity: 1 !important;
+}
+
+/* 标签颜色加深 */
+label {
+  color: #1f2937 !important;
+}
+
+/* 添加动画定义 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slideInUp {
+  animation: slideInUp 0.3s ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* 卡片悬停动画 */
+.card-hover-effect {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* 按钮按下效果 */
+.button-press-effect {
+  transition: transform 0.1s ease;
+}
+
+.button-press-effect:active {
+  transform: scale(0.97);
+}
+
+/* 修复仪表盘中的客户总数数字 */
+.stat-value {
+  color: #111827 !important;
+  font-weight: 700 !important;
+  font-size: 1.5rem !important;
+}
+
+/* 修复最近联系记录和快速操作标题 */
+.section-title {
+  color: #111827 !important;
+  font-weight: 600 !important;
+}
+
+/* 修复用户管理页面标题 */
+.page-title {
+  color: #111827 !important;
+  font-weight: 700 !important;
+}
+
+/* 反馈界面文本颜色加深 */
+.feedback-text {
+  color: #111827 !important;
+}
+
+.contact-info {
+  color: #1f2937 !important;
+  font-weight: 500 !important;
+}
+
+.support-email, .support-phone {
+  color: #111827 !important;
+  font-weight: 600 !important;
+}
+
+.working-hours {
+  color: #1f2937 !important;
+}
+
+.featured-title {
+  color: #111827 !important;
+  font-weight: 700 !important;
+}
+
+/* 客户资料信息加深 */
+.customer-location, .customer-industry, .customer-status {
+  color: #111827 !important;
+  font-weight: 500 !important;
 }

@@ -1,36 +1,410 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CRM 系统
 
-## Getting Started
+![版本](https://img.shields.io/badge/版本-1.0.0-blue.svg)
+![许可证](https://img.shields.io/badge/许可证-MIT-green.svg)
 
-First, run the development server:
+一个现代化的客户关系管理系统，专为中小型企业设计，提供全面的客户管理、任务跟踪和实时通知功能。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 目录
+
+- [概述](#概述)
+- [系统架构](#系统架构)
+- [功能特点](#功能特点)
+- [目录结构](#目录结构)
+- [模块说明](#模块说明)
+- [部署流程](#部署流程)
+- [使用指南](#使用指南)
+- [联系与支持](#联系与支持)
+- [版本历史](#版本历史)
+- [贡献指南](#贡献指南)
+- [许可证](#许可证)
+
+## 概述
+
+本CRM系统是一个全面的客户关系管理解决方案，旨在帮助企业有效管理客户关系、优化销售流程，并提高团队协作效率。系统采用现代化技术栈构建，具有响应式设计，可在桌面和移动设备上流畅运行。
+
+**核心价值：**
+- 集中管理客户信息和互动历史
+- 可视化任务管理和团队协作
+- 实时通知系统确保及时响应
+- 数据分析与报表生成
+- 用户友好的界面设计，减少学习成本
+
+## 系统架构
+
+### 技术栈
+
+本项目采用了现代化的全栈开发技术：
+
+- **前端**：
+  - Next.js 13+ (App Router)
+  - TypeScript
+  - TailwindCSS
+  - React Query
+  - Zustand
+  - React DnD (拖放功能)
+
+- **后端**：
+  - Next.js API Routes
+  - Prisma ORM
+  - PostgreSQL
+  - NextAuth.js (认证)
+  - WebSocket (实时通知)
+
+- **DevOps**：
+  - Docker
+  - Docker Compose
+  - GitHub Actions (CI/CD)
+  - Vercel (部署)
+
+### 架构图
+
+```
++-------------------+        +---------------------+        +----------------+
+|                   |        |                     |        |                |
+|  客户端           |  <-->  |  Next.js 应用       |  <-->  |  PostgreSQL    |
+|  (浏览器/移动设备) |        |  (服务器端渲染+API) |        |  数据库        |
+|                   |        |                     |        |                |
++-------------------+        +---------------------+        +----------------+
+                                     ^
+                                     |
+                                     v
+                             +----------------+
+                             |                |
+                             |  WebSocket     |
+                             |  服务          |
+                             |                |
+                             +----------------+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **客户端**: 通过浏览器或移动设备访问系统
+- **Next.js应用**: 处理服务器端渲染、API请求和WebSocket连接
+- **PostgreSQL数据库**: 存储所有系统数据
+- **WebSocket服务**: 提供实时通知和数据更新
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 目录结构
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+crm-system/
+├── public/                 # 静态资源
+├── src/                    # 源代码
+│   ├── app/                # Next.js App Router 页面
+│   │   ├── api/            # API路由
+│   │   ├── dashboard/      # 仪表板页面
+│   │   ├── login/          # 登录页面
+│   │   ├── register/       # 注册页面
+│   │   ├── user/           # 用户相关页面
+│   │   └── ...
+│   ├── components/         # React组件
+│   │   ├── ui/             # UI组件
+│   │   │   ├── FormElements.tsx       # 表单元素组件
+│   │   │   ├── LoadingState.tsx       # 加载状态组件
+│   │   │   ├── StatusDisplays.tsx     # 状态显示组件
+│   │   │   ├── Notifications.tsx      # 通知组件
+│   │   │   └── ...
+│   │   ├── TaskCard.tsx    # 任务卡片组件
+│   │   ├── TaskDndBoard.tsx # 任务看板组件
+│   │   └── ...
+│   ├── lib/                # 工具库
+│   │   ├── prisma.ts       # Prisma客户端
+│   │   ├── websocket.ts    # WebSocket工具
+│   │   ├── notifications.ts # 通知处理工具
+│   │   └── ...
+│   ├── types/              # TypeScript类型定义
+│   └── ...
+├── prisma/                 # Prisma模式和迁移
+│   ├── schema.prisma       # 数据库模式定义
+│   └── migrations/         # 数据库迁移文件
+├── docs/                   # 文档
+│   ├── USER_GUIDE.md       # 用户手册
+│   └── ...
+├── scripts/                # 实用脚本
+├── docker-compose.yml      # Docker Compose配置
+├── Dockerfile              # Docker构建文件
+├── .env.example            # 环境变量示例
+├── package.json            # 依赖配置
+├── tsconfig.json           # TypeScript配置
+└── README.md               # 项目说明
+```
 
-## Learn More
+## 功能特点
 
-To learn more about Next.js, take a look at the following resources:
+### 核心功能
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+本CRM系统包含以下主要功能模块：
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#### 用户认证与授权
+- 多角色登录系统（管理员、销售、设计师、项目经理、股东）
+- 基于角色的权限控制
+- 密码重置和账户恢复
 
-## Deploy on Vercel
+#### 客户管理
+- 客户信息的全面管理（基本信息、联系人、地址等）
+- 客户分类和标签系统
+- 客户互动历史记录
+- 客户搜索和高级筛选
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### 任务管理
+- 可视化任务看板（看板视图）
+- 任务创建、分配和跟踪
+- 任务优先级和截止日期管理
+- 任务评论和协作功能
+- 拖放式任务状态更新
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### 通知系统
+- 实时通知推送
+- 通知中心集中查看所有通知
+- 可自定义的通知偏好设置
+- 批量处理通知以优化性能
+
+#### 报表与分析
+- 销售活动报表
+- 任务完成率分析
+- 客户活动分析
+- 可导出的报表功能
+
+#### 系统管理
+- 用户和角色管理
+- 系统设置配置
+- 数据备份和恢复
+- 系统日志与监控
+
+### 技术特点
+
+- **响应式设计**: 适配桌面和移动设备的界面
+- **实时通信**: 使用WebSocket实现实时通知和数据更新
+- **高性能**: 优化的数据库查询和API性能监控
+- **安全性**: 完善的认证、授权和数据保护措施
+- **可扩展性**: 模块化设计，易于扩展新功能
+
+## 模块说明
+
+### 用户认证模块
+
+用户认证模块基于NextAuth.js实现，支持多种认证方式：
+
+- 电子邮箱/密码登录
+- 记住登录状态
+- 会话管理
+- 基于JWT的安全认证
+
+系统支持五种用户角色，每种角色拥有不同的权限：
+
+- **管理员**: 拥有所有系统权限
+- **销售员**: 主要负责客户管理和销售活动
+- **设计师**: 负责设计相关任务
+- **项目经理**: 负责任务分配和项目监控
+- **股东**: 具有查看报表和数据分析的权限
+
+### 客户管理模块
+
+客户管理模块提供全面的客户信息管理功能：
+
+- 基本信息管理（名称、联系方式、地址等）
+- 联系人管理（可为一个客户添加多个联系人）
+- 客户标签系统（可自定义标签分类客户）
+- 联系记录（记录与客户的所有互动历史）
+- 相关文件管理（合同、协议等文档）
+
+客户数据通过Prisma ORM与PostgreSQL数据库交互，确保数据完整性和一致性。
+
+### 任务管理模块
+
+任务管理采用可视化看板的方式，主要功能包括：
+
+- 基于拖放的任务状态管理（使用React DnD实现）
+- 任务创建、编辑和删除
+- 任务分配给指定团队成员
+- 任务优先级和截止日期管理
+- 任务关联到特定客户
+- 任务评论系统，支持团队协作
+
+任务看板默认包含以下状态列：待处理、进行中、待审核、已完成、已取消。
+
+### 通知系统
+
+通知系统基于WebSocket实现实时推送，支持多种通知类型：
+
+- 任务分配通知
+- 任务状态更新通知
+- 任务即将到期通知
+- 任务逾期通知
+- 任务评论通知
+- 客户添加通知
+- 客户更新通知
+
+通知系统采用批处理机制，优化数据库操作和WebSocket通信，提高系统性能。用户可以自定义接收哪些类型的通知。
+
+### 报表与分析模块
+
+报表系统提供数据可视化和分析功能：
+
+- 销售活动报表（客户增长、销售漏斗等）
+- 任务完成率报表（个人和团队的任务完成情况）
+- 客户活动报表（客户互动频率和模式）
+- 自定义报表（用户可以根据需求创建自定义报表）
+
+报表支持多种图表类型（柱状图、折线图、饼图等），并可导出为Excel或PDF格式。
+
+## 部署流程
+
+### 环境要求
+
+- Node.js 18+
+- PostgreSQL 14+
+- Docker (可选，用于容器化部署)
+
+### 本地开发环境设置
+
+1. 克隆仓库
+   ```bash
+   git clone https://github.com/yourusername/crm-system.git
+   cd crm-system
+   ```
+
+2. 安装依赖
+   ```bash
+   npm install
+   ```
+
+3. 设置环境变量
+   ```bash
+   cp .env.example .env.local
+   ```
+   编辑`.env.local`文件，配置必要的环境变量，特别是数据库连接和认证设置。
+
+4. 初始化数据库
+   ```bash
+   npx prisma migrate dev
+   ```
+
+5. 启动开发服务器
+```bash
+npm run dev
+   ```
+   应用将在 http://localhost:3000 运行。
+
+### 使用Docker部署
+
+1. 构建Docker镜像
+   ```bash
+   docker build -t crm-system .
+   ```
+
+2. 使用Docker Compose运行应用
+   ```bash
+   docker-compose up -d
+   ```
+   应用将在 http://localhost:3000 运行。
+
+### 生产环境部署
+
+推荐使用Vercel部署Next.js应用：
+
+1. 在Vercel上创建新项目并连接到代码仓库
+2. 配置环境变量
+3. 部署应用
+
+或者您可以使用其他云服务提供商（AWS、Azure、Google Cloud等）部署应用。
+
+## 使用指南
+
+### 初始设置
+
+1. **管理员账户设置**
+   - 首次启动应用时，使用系统自动创建的默认管理员账户登录
+   - 默认管理员账户：admin@example.com / password123 (请立即修改密码)
+   - 登录后进入管理员控制面板，完成初始设置
+
+2. **创建用户账户**
+   - 在管理员控制面板中添加团队成员账户
+   - 为每个用户分配适当的角色和权限
+
+3. **系统配置**
+   - 配置公司信息（名称、标志等）
+   - 设置电子邮件通知
+   - 自定义系统外观和工作流
+
+### 日常操作流程
+
+1. **客户管理**
+   - 添加新客户信息
+   - 记录客户联系历史
+   - 管理客户标签和分类
+
+2. **任务管理**
+   - 创建与分配任务
+   - 使用看板跟踪任务进度
+   - 更新任务状态和评论
+
+3. **通知与提醒**
+   - 查看系统通知
+   - 响应任务分配和截止日期提醒
+
+4. **报表生成**
+   - 生成定期销售和任务报表
+   - 分析客户活动数据
+
+### 常见问题 (FAQ)
+
+**Q: 如何重置忘记的密码？**  
+A: 在登录页面点击"忘记密码"链接，系统会向注册邮箱发送密码重置链接。
+
+**Q: 如何自定义任务状态？**  
+A: 管理员可以在系统设置中的"任务设置"部分自定义任务状态。
+
+**Q: 系统支持哪些导出格式？**  
+A: 报表可以导出为Excel(.xlsx)和PDF格式。
+
+**Q: 如何更改通知偏好设置？**  
+A: 在个人设置中的"通知设置"部分可以自定义接收哪些类型的通知。
+
+## 联系与支持
+
+### 技术支持
+
+如需技术支持，请通过以下方式联系我们：
+
+- **电子邮件**: support@example.com
+- **技术支持热线**: +86 (10) 1234-5678
+- **工作时间**: 周一至周五 9:00 - 18:00
+
+### 反馈与建议
+
+我们欢迎用户提供反馈和建议，以帮助我们改进系统。您可以通过系统内的反馈功能或发送邮件至 feedback@example.com 提交您的意见。
+
+## 版本历史
+
+- **1.0.0** (2023-09-01)
+  - 初始版本发布
+  - 实现核心客户管理功能
+  - 实现任务管理系统
+  - 实现通知系统
+  - 基础报表功能
+
+- **0.9.0** (2023-08-15)
+  - Beta测试版本
+  - 完成主要功能开发
+  - 进行性能优化
+  - 修复已知问题
+
+## 贡献指南
+
+我们欢迎社区贡献，如果您希望参与项目开发，请遵循以下步骤：
+
+1. Fork项目仓库
+2. 创建您的特性分支 (`git checkout -b feature/amazing-feature`)
+3. 提交您的更改 (`git commit -m 'Add some amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 创建Pull Request
+
+### 开发规范
+
+- 遵循TypeScript编码规范
+- 为所有新功能编写测试
+- 确保所有测试通过
+- 保持代码简洁可读
+
+## 许可证
+
+本项目基于MIT许可证开源 - 详情请查看 [LICENSE](LICENSE) 文件
