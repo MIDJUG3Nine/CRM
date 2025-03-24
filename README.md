@@ -1,6 +1,6 @@
 # CRM 系统
 
-![版本](https://img.shields.io/badge/版本-1.0.0-blue.svg)
+![版本](https://img.shields.io/badge/版本-0.01.0-blue.svg)
 ![许可证](https://img.shields.io/badge/许可证-MIT-green.svg)
 
 一个现代化的客户关系管理系统，专为中小型企业设计，提供全面的客户管理、任务跟踪和实时通知功能。
